@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="paxelogo.jpg">
+<title>PAXE — Asset Management & Brokerage</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --black:    #080808;
+    --black-2:  #0d0d0d;
+    --black-3:  #111111;
+    --black-4:  #161616;
+    --black-5:  #1c1c1c;
+    --gold:     #C9A84C;
+    --gold-lt:  #E2C97A;
+    --gold-dk:  #9A7B30;
+    --gold-dim: rgba(201,168,76,0.12);
+    --gold-line:rgba(201,168,76,0.3);
+    --white:    #F5F2EC;
+    --white-dim:#c2bdb4;
+    --grey:     #444;
+    --grey-lt:  #888;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+  }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── GRAIN OVERLAY ─────────────────────────── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ─── TYPOGRAPHY ────────────────────────────── */
+  .display { font-family: 'Cormorant Garamond', serif; }
+  .serif   { font-family: 'Libre Baskerville', serif; }
+
+  h1,h2,h3,h4 { font-family: 'Cormorant Garamond', serif; font-weight: 400; letter-spacing: 0.02em; }
+
+  .gold     { color: var(--gold); }
+  .gold-lt  { color: var(--gold-lt); }
+  .dim      { color: var(--white-dim); }
+
+  /* ─── UTILITIES ─────────────────────────────── */
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  @media (max-width: 900px) { .container { padding: 0 30px; } }
+  @media (max-width: 600px) { .container { padding: 0 20px; } }
+
+  .rule {
+    border: none;
+    border-top: 1px solid var(--gold-line);
+    margin: 0;
+  }
+
+  .section-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+
+  /* ─── NAVIGATION ────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0 60px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(8,8,8,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    transition: border-color 0.3s;
+  }
+
+  nav.scrolled {
+    border-bottom-color: rgba(201,168,76,0.18);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .nav-logo span {
+    display: block;
+    width: 1px;
+    height: 22px;
+    background: var(--gold-line);
+  }
+
+  .nav-logo-sub {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 8.5px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    margin-top: 1px;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  .nav-cta {
+    border: 1px solid var(--gold-line) !important;
+    padding: 9px 22px !important;
+    color: var(--gold) !important;
+    letter-spacing: 0.22em !important;
+    transition: background 0.2s, color 0.2s !important;
+  }
+
+  .nav-cta:hover {
+    background: var(--gold) !important;
+    color: var(--black) !important;
+  }
+
+  .nav-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    padding: 4px;
+  }
+
+  .nav-menu-btn span {
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+    transition: transform 0.3s, opacity 0.3s;
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 30px; }
+    .nav-links { display: none; }
+    .nav-menu-btn { display: flex; }
+
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 72px;
+      left: 0;
+      right: 0;
+      background: rgba(8,8,8,0.98);
+      padding: 40px;
+      gap: 30px;
+      border-bottom: 1px solid var(--gold-line);
+    }
+  }
+
+  /* ─── HERO ──────────────────────────────────── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 160px 60px 100px;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 60% at 80% 50%, rgba(201,168,76,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 80% at 10% 50%, rgba(201,168,76,0.03) 0%, transparent 60%),
+      linear-gradient(180deg, var(--black) 0%, var(--black-2) 100%);
+    z-index: 0;
+  }
+
+  .hero-lines {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .hero-lines::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: linear-gradient(180deg, transparent 0%, rgba(201,168,76,0.15) 40%, rgba(201,168,76,0.15) 60%, transparent 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.2s ease forwards;
+  }
+
+  .hero-eyebrow-line {
+    width: 48px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-eyebrow-text {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .hero-title {
+    font-size: clamp(54px, 7vw, 110px);
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+    opacity: 0;
+    animation: fadeUp 1s 0.35s ease forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-title-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(18px, 2.5vw, 32px);
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s ease forwards;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.9;
+    color: var(--white-dim);
+    max-width: 580px;
+    margin-bottom: 60px;
+    opacity: 0;
+    animation: fadeUp 1s 0.65s ease forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 1s 0.8s ease forwards;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 16px 44px;
+    background: var(--gold);
+    color: var(--black);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+
+  .btn-primary:hover {
+    background: var(--gold-lt);
+    box-shadow: 0 0 40px rgba(201,168,76,0.25);
+  }
+
+  .btn-ghost {
+    display: inline-block;
+    padding: 15px 44px;
+    border: 1px solid var(--gold-line);
+    color: var(--gold);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+    color: var(--gold-lt);
+  }
+
+  .hero-right {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    opacity: 0;
+    animation: fadeIn 1.4s 1.2s ease forwards;
+  }
+
+  .hero-stat {
+    text-align: right;
+    border-right: 1px solid var(--gold-line);
+    padding-right: 20px;
+  }
+
+  .hero-stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .hero-stat-label {
+    font-size: 8.5px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey-lt);
+    margin-top: 4px;
+  }
+
+  @media (max-width: 1100px) { .hero-right { display: none; } }
+  @media (max-width: 900px) {
+    #hero { padding: 140px 30px 80px; }
+  }
+
+  /* ─── MARQUEE ───────────────────────────────── */
+  .marquee-wrap {
+    background: var(--gold);
+    padding: 14px 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee 32s linear infinite;
+  }
+
+  .marquee-track:hover { animation-play-state: paused; }
+
+  .marquee-item {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--black);
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+
+  .marquee-item::after {
+    content: '◆';
+    font-size: 7px;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ─── PURPOSE ───────────────────────────────── */
+  #purpose {
+    padding: 120px 0;
+    background: var(--black-2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #purpose::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-line), transparent);
+  }
+
+  .purpose-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .purpose-left .section-label { margin-bottom: 32px; }
+
+  .purpose-heading {
+    font-size: clamp(38px, 4vw, 62px);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--white);
+  }
+
+  .purpose-heading em { color: var(--gold); font-style: italic; }
+
+  .purpose-quote {
+    margin-top: 48px;
+    padding-left: 24px;
+    border-left: 2px solid var(--gold);
+  }
+
+  .purpose-quote p {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 20px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--white-dim);
+  }
+
+  .purpose-quote cite {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-style: normal;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 16px;
+  }
+
+  .purpose-right {
+    padding-top: 20px;
+  }
+
+  .purpose-right p {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--white-dim);
+    margin-bottom: 24px;
+  }
+
+  .vision-box {
+    margin-top: 48px;
+    background: var(--black-4);
+    border: 1px solid var(--gold-line);
+    padding: 36px 40px;
+    position: relative;
+  }
+
+  .vision-box::before {
+    content: 'VISION';
+    position: absolute;
+    top: -8px;
+    left: 32px;
+    background: var(--black-4);
+    padding: 0 12px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+  }
+
+  .vision-box p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--white);
+    margin: 0;
+  }
+
+  @media (max-width: 900px) {
+    .purpose-grid { grid-template-columns: 1fr; gap: 48px; }
+  }
+
+  /* ─── SERVICES ──────────────────────────────── */
+  #services {
+    padding: 120px 0;
+    background: var(--black);
+    position: relative;
+  }
+
+  .services-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-bottom: 80px;
+    align-items: end;
+  }
+
+  .services-title {
+    font-size: clamp(38px, 4vw, 60px);
+    font-weight: 300;
+    line-height: 1.15;
+  }
+
+  .services-title em { color: var(--gold); font-style: italic; }
+
+  .services-intro {
+    font-size: 14.5px;
+    line-height: 1.9;
+    color: var(--white-dim);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--gold-line);
+    border: 1px solid var(--gold-line);
+  }
+
+  .service-card {
+    background: var(--black-3);
+    padding: 52px 44px;
+    position: relative;
+    transition: background 0.3s;
+    overflow: hidden;
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .service-card:hover { background: var(--black-5); }
+  .service-card:hover::before { transform: scaleX(1); }
+
+  .service-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 68px;
+    font-weight: 300;
+    color: rgba(201,168,76,0.08);
+    line-height: 1;
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    transition: color 0.3s;
+  }
+
+  .service-card:hover .service-number { color: rgba(201,168,76,0.14); }
+
+  .service-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 28px;
+    color: var(--gold);
+  }
+
+  .service-title {
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 16px;
+    line-height: 1.25;
+  }
+
+  .service-desc {
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: var(--grey-lt);
+  }
+
+  @media (max-width: 900px) {
+    .services-header { grid-template-columns: 1fr; gap: 24px; }
+    .services-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── PRIME CRITERIA ────────────────────────── */
+  #prime {
+    padding: 120px 0;
+    background: var(--black-2);
+    position: relative;
+  }
+
+  .prime-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: center;
+  }
+
+  .prime-left .section-label { margin-bottom: 24px; }
+
+  .prime-title {
+    font-size: clamp(36px, 3.5vw, 58px);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 28px;
+  }
+
+  .prime-title em { color: var(--gold); font-style: italic; }
+
+  .prime-desc {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--white-dim);
+    margin-bottom: 48px;
+  }
+
+  .prime-statement {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-style: italic;
+    color: var(--gold-lt);
+    border-top: 1px solid var(--gold-line);
+    padding-top: 28px;
+  }
+
+  .prime-criteria {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--gold-line);
+  }
+
+  .criterion {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    align-items: start;
+    padding: 28px 32px;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+    transition: background 0.3s;
+    cursor: default;
+  }
+
+  .criterion:last-child { border-bottom: none; }
+  .criterion:hover { background: var(--gold-dim); }
+
+  .criterion-check {
+    font-size: 14px;
+    color: var(--gold);
+    font-weight: 600;
+    padding-top: 2px;
+  }
+
+  .criterion-body {}
+
+  .criterion-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+
+  .criterion-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--white-dim);
+  }
+
+  @media (max-width: 900px) {
+    .prime-layout { grid-template-columns: 1fr; gap: 56px; }
+  }
+
+  /* ─── ASSET CLASSES ─────────────────────────── */
+  #assets {
+    padding: 120px 0;
+    background: var(--black);
+  }
+
+  .assets-header {
+    text-align: center;
+    margin-bottom: 72px;
+  }
+
+  .assets-title {
+    font-size: clamp(36px, 4vw, 58px);
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .assets-title em { color: var(--gold); font-style: italic; }
+
+  .assets-desc {
+    max-width: 560px;
+    margin: 0 auto;
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--white-dim);
+  }
+
+  .assets-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+  }
+
+  .asset-card {
+    background: var(--black-3);
+    border: 1px solid rgba(201,168,76,0.1);
+    padding: 40px 28px 36px;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s, background 0.3s;
+    text-align: center;
+  }
+
+  .asset-card:hover {
+    border-color: var(--gold-line);
+    transform: translateY(-4px);
+    background: var(--black-4);
+  }
+
+  .asset-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 20px;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .asset-icon svg { width: 100%; height: 100%; }
+
+  .asset-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+
+  .asset-tag {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dk);
+    background: var(--gold-dim);
+    padding: 4px 10px;
+    display: inline-block;
+  }
+
+  @media (max-width: 1100px) { .assets-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 700px)  { .assets-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px)  { .assets-grid { grid-template-columns: 1fr; } }
+
+  /* ─── PHILOSOPHY ────────────────────────────── */
+  #philosophy {
+    padding: 120px 0;
+    background: var(--black-3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .phi-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 220px;
+    font-weight: 300;
+    color: rgba(201,168,76,0.03);
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .phi-header {
+    text-align: center;
+    margin-bottom: 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .phi-title {
+    font-size: clamp(36px, 4vw, 60px);
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .phi-title em { color: var(--gold); font-style: italic; }
+
+  .phi-pillars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .phi-pillar {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 2px solid var(--gold-line);
+    transition: border-top-color 0.3s;
+  }
+
+  .phi-pillar:hover { border-top-color: var(--gold); }
+
+  .phi-pillar-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 54px;
+    font-weight: 300;
+    color: rgba(201,168,76,0.15);
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+
+  .phi-pillar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--gold);
+    margin-bottom: 12px;
+    line-height: 1.25;
+  }
+
+  .phi-pillar-text {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--grey-lt);
+  }
+
+  .phi-closing {
+    margin-top: 80px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .phi-closing p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(18px, 2.2vw, 28px);
+    font-style: italic;
+    font-weight: 300;
+    color: var(--white-dim);
+    line-height: 1.7;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .phi-closing strong {
+    color: var(--gold);
+    font-style: normal;
+    font-weight: 400;
+  }
+
+  @media (max-width: 900px) { .phi-pillars { grid-template-columns: 1fr 1fr; gap: 32px; } }
+  @media (max-width: 540px) { .phi-pillars { grid-template-columns: 1fr; } }
+
+  /* ─── CTA ───────────────────────────────────── */
+  #cta {
+    padding: 140px 0;
+    background: var(--black-2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(201,168,76,0.05) 0%, transparent 70%);
+  }
+
+  .cta-inner {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .cta-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .cta-label::before, .cta-label::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--gold-line);
+  }
+
+  .cta-title {
+    font-size: clamp(40px, 5vw, 76px);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 28px;
+  }
+
+  .cta-title em { color: var(--gold); font-style: italic; }
+
+  .cta-text {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--white-dim);
+    margin-bottom: 56px;
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  /* ─── FOOTER ────────────────────────────────── */
+  footer {
+    background: var(--black);
+    border-top: 1px solid var(--gold-line);
+    padding: 72px 0 40px;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 64px;
+    margin-bottom: 64px;
+  }
+
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .footer-tagline {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 24px;
+  }
+
+  .footer-about {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--grey);
+    max-width: 280px;
+  }
+
+  .footer-col-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .footer-links a {
+    font-size: 13px;
+    color: var(--grey);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--white-dim); }
+
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 32px;
+    border-top: 1px solid rgba(201,168,76,0.08);
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .footer-copy {
+    font-size: 11px;
+    color: var(--grey);
+    letter-spacing: 0.05em;
+  }
+
+  .footer-disclaimer {
+    font-size: 10.5px;
+    color: var(--grey);
+    text-align: right;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 1000px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; } }
+  @media (max-width: 600px)  { .footer-grid { grid-template-columns: 1fr; gap: 36px; } }
+
+  /* ─── DIVIDER ───────────────────────────────── */
+  .gold-divider {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 0 auto 64px;
+    max-width: 200px;
+  }
+
+  .gold-divider span { flex: 1; height: 1px; background: var(--gold-line); }
+  .gold-divider i { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; }
+
+  /* ─── SCROLL REVEAL ─────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── ANIMATIONS ────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ─── SCROLLBAR ─────────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dk); }
+
+  /* ─── SELECTION ─────────────────────────────── */
+  ::selection { background: rgba(201,168,76,0.22); color: var(--white); }
+</style>
+</head>
+
+<body>
+
+<!-- ════════════════════ NAVIGATION ════════════════════ -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <div>
+      PAXE
+      <div class="nav-logo-sub">Asset Management</div>
+    </div>
+  </a>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#purpose">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#prime">Standards</a></li>
+    <li><a href="#assets">Assets</a></li>
+    <li><a href="#philosophy">Philosophy</a></li>
+    <li><a href="#cta" class="nav-cta">Engage</a></li>
+  </ul>
+
+  <button class="nav-menu-btn" id="menuBtn" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+
+  <div class="hero-content" style="max-width:1200px;margin:0 auto;padding:0 60px;width:100%;">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <span class="hero-eyebrow-text">Asset Management & Brokerage</span>
+    </div>
+
+    <h1 class="hero-title display">
+      Capital<br>
+      <em>Disciplined.</em><br>
+      Assets Prime.
+    </h1>
+
+    <p class="hero-title-sub">PAXE &nbsp;·&nbsp; Africa &amp; Beyond</p>
+
+    <p class="hero-desc">
+      PAXE connects verified, high-value assets with qualified local and international investors — ensuring capital is deployed with structure, discipline, and long-term intent. Built for those who understand that lasting wealth is a function of quality, not speculation.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#services" class="btn-primary">Explore Our Services</a>
+      <a href="#prime" class="btn-ghost">Our Standards</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-stat">
+      <div class="hero-stat-number">Prime</div>
+      <div class="hero-stat-label">Assets Only</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">5</div>
+      <div class="hero-stat-label">Asset Classes</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number">Zero</div>
+      <div class="hero-stat-label">Compromise</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ MARQUEE ════════════════════ -->
+<div class="marquee-wrap">
+  <div class="marquee-track" aria-hidden="true">
+    <!-- Doubled for seamless loop -->
+    <span class="marquee-item">Asset Verification</span>
+    <span class="marquee-item">Prime Assets Only</span>
+    <span class="marquee-item">Institutional Standards</span>
+    <span class="marquee-item">Qualified Investors</span>
+    <span class="marquee-item">Capital Discipline</span>
+    <span class="marquee-item">Long-Term Value</span>
+    <span class="marquee-item">Risk Management</span>
+    <span class="marquee-item">Africa &amp; International</span>
+    <span class="marquee-item">Asset Verification</span>
+    <span class="marquee-item">Prime Assets Only</span>
+    <span class="marquee-item">Institutional Standards</span>
+    <span class="marquee-item">Qualified Investors</span>
+    <span class="marquee-item">Capital Discipline</span>
+    <span class="marquee-item">Long-Term Value</span>
+    <span class="marquee-item">Risk Management</span>
+    <span class="marquee-item">Africa &amp; International</span>
+  </div>
+</div>
+
+<!-- ════════════════════ PURPOSE ════════════════════ -->
+<section id="purpose">
+  <div class="container">
+    <div class="purpose-grid">
+      <div class="purpose-left reveal">
+        <div class="section-label">Our Purpose</div>
+        <h2 class="purpose-heading">
+          To show people<br>
+          how much more<br>
+          <em>wealthy</em><br>
+          they can be.
+        </h2>
+        <div class="purpose-quote">
+          <p>Wealth is not a promise. It is a possibility — unlocked through understanding, access, and disciplined participation in quality assets.</p>
+          <cite>— PAXE</cite>
+        </div>
+      </div>
+
+      <div class="purpose-right reveal" style="transition-delay: 0.2s">
+        <p>PAXE is an asset management and brokerage firm built around a single, deliberate focus: <strong style="color:var(--white)">prime assets.</strong></p>
+        <p>We serve investors who understand that lasting wealth is built through quality, verification, and thoughtful execution — not speculation or noise. This is not a mass-market platform. Every engagement is intentional, every asset is selected, and every investor is qualified.</p>
+        <p>Our mandate is to bring structure and clarity to capital — connecting serious participants with opportunities worthy of their ambitions.</p>
+
+        <div class="vision-box">
+          <p>To help build a community of one million people who rise into their financial power and potential — through education, asset ownership, and long-term thinking.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ SERVICES ════════════════════ -->
+<section id="services">
+  <div class="container">
+    <div class="services-header reveal">
+      <div>
+        <div class="section-label">What We Do</div>
+        <h2 class="services-title">Three pillars of<br><em>professional capital</em></h2>
+      </div>
+      <p class="services-intro">PAXE operates across three core disciplines — each designed to protect, grow, and manage your capital with institutional precision.</p>
+    </div>
+
+    <div class="services-grid reveal" style="transition-delay:0.15s">
+      <!-- Card 1 -->
+      <div class="service-card">
+        <span class="service-number">01</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h3 class="service-title">Asset<br>Brokerage</h3>
+        <p class="service-desc">PAXE brokers prime, verified assets between asset owners and qualified investors. Assets are presented selectively — not in volume — and only after meeting strict internal standards. Every transaction is structured, documented, and executed with professional discipline.</p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="service-card">
+        <span class="service-number">02</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <h3 class="service-title">Asset<br>Management</h3>
+        <p class="service-desc">For selected investors and opportunities, PAXE provides professional oversight and coordination — ensuring that assets are managed with discipline beyond acquisition. We monitor, coordinate, and report with the rigour of an institutional partner.</p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="service-card">
+        <span class="service-number">03</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3 class="service-title">Risk<br>Management</h3>
+        <p class="service-desc">Risk assessment and verification precede every opportunity. Capital protection is foundational to how we operate. Before any asset reaches an investor, it has passed our internal verification process — legal review, risk profiling, and performance assessment.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ PRIME CRITERIA ════════════════════ -->
+<section id="prime">
+  <div class="container">
+    <div class="prime-layout">
+      <div class="prime-left reveal">
+        <div class="section-label">PAXE Standards</div>
+        <h2 class="prime-title">
+          What makes an<br>
+          asset <em>prime</em>
+        </h2>
+        <p class="prime-desc">Not every asset qualifies. An asset is considered prime at PAXE only when it meets all five of our foundational criteria. Assets that fail to meet these standards are not presented — to anyone, at any time.</p>
+        <p class="prime-statement serif">"Quality precedes quantity.<br>Long-term value precedes short-term excitement."</p>
+      </div>
+
+      <div class="prime-criteria reveal" style="transition-delay:0.2s">
+        <div class="criterion">
+          <div class="criterion-check">✓</div>
+          <div class="criterion-body">
+            <div class="criterion-name">Liquidity</div>
+            <div class="criterion-text">Clear exit, transfer, or resale potential with defined pathways to capital recovery.</div>
+          </div>
+        </div>
+        <div class="criterion">
+          <div class="criterion-check">✓</div>
+          <div class="criterion-body">
+            <div class="criterion-name">Security &amp; Verification</div>
+            <div class="criterion-text">Properly verified, legally sound, and free from material disputes or encumbrances.</div>
+          </div>
+        </div>
+        <div class="criterion">
+          <div class="criterion-check">✓</div>
+          <div class="criterion-body">
+            <div class="criterion-name">Return on Investment</div>
+            <div class="criterion-text">Sustainable return potential aligned with the asset's verified risk profile.</div>
+          </div>
+        </div>
+        <div class="criterion">
+          <div class="criterion-check">✓</div>
+          <div class="criterion-body">
+            <div class="criterion-name">Time Horizon</div>
+            <div class="criterion-text">Positive performance demonstrated across both short- and long-term horizons.</div>
+          </div>
+        </div>
+        <div class="criterion">
+          <div class="criterion-check">✓</div>
+          <div class="criterion-body">
+            <div class="criterion-name">Manageability</div>
+            <div class="criterion-text">Capable of professional oversight and governance without unnecessary structural complexity.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ ASSET CLASSES ════════════════════ -->
+<section id="assets">
+  <div class="container">
+    <div class="assets-header reveal">
+      <div class="section-label" style="text-align:center;margin-bottom:16px;">Asset Coverage</div>
+      <h2 class="assets-title">Every class.<br><em>One standard.</em></h2>
+      <p class="assets-desc" style="margin-top:20px;">PAXE operates across multiple asset classes. Every category is governed by the same discipline, the same verification process, and the same unwavering standards.</p>
+    </div>
+
+    <div class="assets-grid reveal" style="transition-delay:0.15s">
+      <div class="asset-card">
+        <div class="asset-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="asset-name">Real Estate &amp; Land</div>
+        <span class="asset-tag">Tangible</span>
+      </div>
+
+      <div class="asset-card">
+        <div class="asset-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+            <path d="M7 8h10M7 12h6"/>
+          </svg>
+        </div>
+        <div class="asset-name">Operating Assets</div>
+        <span class="asset-tag">Income-Generating</span>
+      </div>
+
+      <div class="asset-card">
+        <div class="asset-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+            <polyline points="16 7 22 7 22 13"/>
+          </svg>
+        </div>
+        <div class="asset-name">Financial Assets</div>
+        <span class="asset-tag">Stocks · Bonds · Funds</span>
+      </div>
+
+      <div class="asset-card">
+        <div class="asset-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
+        <div class="asset-name">Energy &amp; Natural Resources</div>
+        <span class="asset-tag">Strategic</span>
+      </div>
+
+      <div class="asset-card">
+        <div class="asset-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <div class="asset-name">Digital &amp; Alternative</div>
+        <span class="asset-tag">Emerging</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ PHILOSOPHY ════════════════════ -->
+<section id="philosophy">
+  <div class="phi-bg-text" aria-hidden="true">PAXE</div>
+
+  <div class="container">
+    <div class="phi-header reveal">
+      <div class="section-label">Our Philosophy</div>
+      <h2 class="phi-title">How we <em>think</em> about capital</h2>
+    </div>
+
+    <div class="phi-pillars reveal" style="transition-delay:0.1s">
+      <div class="phi-pillar">
+        <div class="phi-pillar-number">I</div>
+        <div class="phi-pillar-title">Education First</div>
+        <p class="phi-pillar-text">Education precedes opportunity. Every investor who engages with PAXE is equipped to understand what they are acquiring and why.</p>
+      </div>
+      <div class="phi-pillar">
+        <div class="phi-pillar-number">II</div>
+        <div class="phi-pillar-title">Risk Before Returns</div>
+        <p class="phi-pillar-text">Risk management precedes returns. Capital protection is not a feature — it is the foundation from which every opportunity is built.</p>
+      </div>
+      <div class="phi-pillar">
+        <div class="phi-pillar-number">III</div>
+        <div class="phi-pillar-title">Quality Over Volume</div>
+        <p class="phi-pillar-text">PAXE does not compete on volume. Fewer, better assets. Every time. Quality precedes quantity — without exception.</p>
+      </div>
+      <div class="phi-pillar">
+        <div class="phi-pillar-number">IV</div>
+        <div class="phi-pillar-title">Long-Term Thinking</div>
+        <p class="phi-pillar-text">Long-term value precedes short-term excitement. Wealth that endures is built through patience, discipline, and compounding quality.</p>
+      </div>
+    </div>
+
+    <div class="phi-closing reveal" style="transition-delay:0.25s">
+      <div class="gold-divider"><span></span><i></i><span></span></div>
+      <p>"PAXE does not compete on volume. We compete on <strong>discipline</strong>, <strong>clarity</strong>, and <strong>trust</strong> — helping individuals and communities rise into greater financial confidence, control, and long-term potential."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ CTA ════════════════════ -->
+<section id="cta">
+  <div class="container">
+    <div class="cta-inner reveal">
+      <div class="cta-label">Begin Your Engagement</div>
+      <h2 class="cta-title">
+        Serious capital<br>
+        deserves <em>serious</em> partners.
+      </h2>
+      <p class="cta-text">
+        PAXE works with a select group of investors, asset holders, and institutional partners. If you operate at a level where quality, verification, and discipline matter — we are ready to engage.
+      </p>
+      <div class="cta-actions">
+        <a href="mailto:paxefirmenterprise@gmail.com" class="btn-primary">Request Engagement</a>
+        <a href="#services" class="btn-ghost">View Our Services</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">PAXE</div>
+        <div class="footer-tagline">Asset Management &amp; Brokerage</div>
+        <p class="footer-about">Built around a single, deliberate focus: prime assets. Connecting verified, high-value assets with qualified local and international investors.</p>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Services</div>
+        <ul class="footer-links">
+          <li><a href="#services">Asset Brokerage</a></li>
+          <li><a href="#services">Asset Management</a></li>
+          <li><a href="#services">Risk Management</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Standards</div>
+        <ul class="footer-links">
+          <li><a href="#prime">Prime Criteria</a></li>
+          <li><a href="#assets">Asset Classes</a></li>
+          <li><a href="#philosophy">Our Philosophy</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Engage</div>
+        <ul class="footer-links">
+          <li><a href="#cta">Investor Enquiries</a></li>
+          <li><a href="#cta">Asset Holders</a></li>
+          <li><a href="#cta">Institutional Partners</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 PAXE. All rights reserved.</span>
+      <span class="footer-disclaimer">PAXE is an asset management and brokerage firm. All investment activities are subject to risk. Past performance does not guarantee future results. This website is for informational purposes only and does not constitute financial advice.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════ JAVASCRIPT ════════════════════ -->
+<script>
+  // ── Nav scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // ── Mobile menu
+  const menuBtn = document.getElementById('menuBtn');
+  const navLinks = document.getElementById('navLinks');
+
+  menuBtn.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+  });
+
+  // Close on link click
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => navLinks.classList.remove('open'));
+  });
+
+  // ── Scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  revealEls.forEach(el => observer.observe(el));
+
+  // ── Smooth active nav link highlighting
+  const sections = document.querySelectorAll('section[id]');
+  const navAnchors = document.querySelectorAll('.nav-links a');
+
+  const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navAnchors.forEach(a => {
+          a.style.color = '';
+          if (a.getAttribute('href') === '#' + entry.target.id) {
+            a.style.color = 'var(--gold)';
+          }
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(s => sectionObserver.observe(s));
+</script>
+
+</body>
+</html>
